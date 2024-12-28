@@ -20,6 +20,7 @@ router.get("/:transby/:id", async (req, res, next) => {
   try {
     const transby = req.params.transby;
     const id = req.params.id;
+    console.log(transby, id);
     const trans_tb = await prisma.trans_tb.findMany({
       where: { [transby]: +id },
       orderBy: [{ Trans_dt: "desc" }, { T_Order: "desc" }],
