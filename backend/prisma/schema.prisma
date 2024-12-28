@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model AC_tb {
+  id    Int       @id @default(autoincrement() ) @map("ACID")
+  mem_tb  mem_tb?   @relation(fields: [MEMID], references: [id])
+  MEMID   Int?    @db.Int @map("MemID")
+  AC_type String?   @db.VarChar(10)
+  AC_Sub  String?   @db.VarChar(50)
+  ACNO    String?   @db.VarChar(20)
+  DOC     DateTime? @db.DateTime
+  Amt     Float?  @default(0) @db.Float()
+  Period  Int?      @default(0)
+  CloseDT DateTime? @db.DateTime
+  prn     Float?  @default(0) @db.Float()
+  int     Float?  @default(0) @db.Float()
+  rate    Float?  @default(0) @db.Float()
+  Closed  String?   @default("N") @db.VarChar(1)
+  Remarks String?   @db.NVarChar(250)
+}
+
+model mem_tb {
+  id   Int       @id @default(autoincrement() )@map("MemID")
+  Memtype String?   @default("emp") @db.VarChar(10)
+  empno   Int?
+  gno     Int?
+  hrno    Int?
+  name    String?   @db.VarChar(50)
+  desgn   String?   @db.VarChar(20)
+  sex     String?   @db.VarChar(1)
+  DOB     DateTime? @db.DateTime
+  DOA     DateTime? @db.DateTime
+  DOR     DateTime? @db.DateTime
+  DOM     DateTime? @db.DateTime
+  DIV     String?   @db.VarChar(20)
+  subdiv  String?   @db.VarChar(20)
+  Status  String?   @db.VarChar(50)
+  Phone1  String?   @db.VarChar(10)
+
+  Accounts AC_tb[]
+}
+
+
+model trans_desc_tb {
+  id Int     @id(map: "PK_trans_tb") @default(autoincrement() ) @map("Trans_des_ID")
+  Head         String? @db.VarChar(100)
+  AC_Sub       String? @db.VarChar(100)
+  Trans_desc   String? @db.VarChar(150)
+  AC_type      String? @db.VarChar(10)
+  CB_side      String? @db.NChar(1)
+  TransType    String? @db.VarChar(1)
+  I_type       String? @db.VarChar(10)
+  Post_type    String? @db.VarChar(3)
+  Memtype      String? @db.VarChar(10)
+}
+
+model trans_tb {
+  id     Int       @id(map: "PK_Data_tb") @default(autoincrement() ) @map("Trans_ID")
+  ActionID     Int?
+  Trans_des_ID Int?
+  Trans_dt     DateTime? @db.DateTime
+  CB_dt        DateTime? @db.DateTime
+  ACID         Int?
+  I_NO         String?   @db.VarChar(10)
+  Cash_amt     Float?  @default(0, map: "DF_trans_tb_Cash_amt") @db.Float()
+  Chq_amt      Float?  @default(0, map: "DF_trans_tb_Chq_amt") @db.Float()
+  Adj_amt      Float?  @default(0, map: "DF_trans_tb_Adj_amt") @db.Float()
+  Total_amt    Float?  @default(0, map: "DF_trans_tb_Total_amt") @db.Float()
+  PRN          Float?  @default(0, map: "DF_trans_tb_PRN") @db.Float()
+  PRN_D        Float?  @default(0, map: "DF_trans_tb_PRN_T") @db.Float()
+  PRN_C        Float?  @default(0, map: "DF_trans_tb_PRN_C") @db.Float()
+  PRN_B        Float?  @default(0, map: "DF_trans_tb_PRN_B") @db.Float()
+  INT          Float?  @default(0, map: "DF_trans_tb_INT") @db.Float()
+  INT_D        Float?  @default(0, map: "DF_trans_tb_INT_D") @db.Float()
+  INT_C        Float?  @default(0, map: "DF_trans_tb_INT_C") @db.Float()
+  INT_B        Float?  @default(0, map: "DF_trans_tb_INT_B") @db.Float()
+  rate         Float?  @default(0, map: "DF_trans_tb_rate") @db.Float()
+  Days         Int?
+  Status       String?   @db.VarChar(1)
+  T_Order      Int?
+  CreatedOn    DateTime? @db.DateTime
+  CreatedBy    Int?
+  ModifiedOn   DateTime? @db.DateTime
+  ModifiedBy   Int?
+  Remarks      String?   @db.VarChar(50)
+  CB_side      String? @db.NChar(1)
+}

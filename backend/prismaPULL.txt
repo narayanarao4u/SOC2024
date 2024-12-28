@@ -1,0 +1,303 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model AC_tb {
+  id      Int       @id(map: "PK_AC_tb") @default(autoincrement()) @map("ACID")
+  MemID   Int?
+  AC_type String?   @db.VarChar(10)
+  AC_Sub  String?   @db.VarChar(50)
+  ACNO    String?   @db.VarChar(20)
+  DOC     DateTime? @db.DateTime
+  Amt     Decimal?  @default(0, map: "DF_AC_tb_Amt") @db.Decimal(18, 2)
+  Period  Int?      @default(0, map: "DF_AC_tb_Period")
+  CloseDT DateTime? @db.DateTime
+  prn     Decimal?  @default(0, map: "DF_AC_tb_prn") @db.Decimal(18, 2)
+  int     Decimal?  @default(0, map: "DF_AC_tb_int") @db.Decimal(18, 2)
+  rate    Decimal?  @default(0, map: "DF_AC_tb_rate") @db.Decimal(18, 2)
+  Closed  String?   @default("N", map: "DF_AC_tb_Closed") @db.VarChar(1)
+  Remarks String?   @db.NVarChar(250)
+}
+
+model mem_tb {
+  id      Int       @id(map: "PK_mem_tb") @default(autoincrement()) @map("MemID")
+  Memtype String?   @default("EMP", map: "DF_mem_tb_Memtype") @db.VarChar(10)
+  empno   Int?
+  gno     Int?
+  hrno    Int?
+  name    String?   @db.VarChar(50)
+  desgn   String?   @db.VarChar(20)
+  sex     String?   @db.VarChar(1)
+  DOB     DateTime? @db.DateTime
+  DOA     DateTime? @db.DateTime
+  DOR     DateTime? @db.DateTime
+  DOM     DateTime? @db.DateTime
+  DIV     String?   @db.VarChar(20)
+  subdiv  String?   @db.VarChar(20)
+  Status  String?   @db.VarChar(50)
+  Phone1  String?   @db.VarChar(10)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model AC_tb_H {
+  ACID      Int?
+  MemID     Int?
+  AC_type   String?   @db.VarChar(10)
+  AC_Sub    String?   @db.VarChar(50)
+  ACNO      String?   @db.VarChar(20)
+  DOC       DateTime? @db.DateTime
+  Amt       Decimal?  @db.Decimal(18, 2)
+  Period    Int?
+  CloseDT   DateTime? @db.DateTime
+  prn       Decimal?  @db.Decimal(18, 2)
+  int       Decimal?  @db.Decimal(18, 2)
+  rate      Decimal?  @db.Decimal(18, 2)
+  Closed    String?   @db.VarChar(1)
+  Remarks   String?   @db.NVarChar(250)
+  DateStamp DateTime? @default(now(), map: "DF__AC_tb_H__DateSta__5C6CB6D7") @db.DateTime
+
+  @@ignore
+}
+
+model Action_TB {
+  ActionID   Int       @id(map: "PK_Action_TB") @default(autoincrement())
+  ActionDesc String?   @db.VarChar(250)
+  MemID      Int?
+  ActionDT   DateTime? @db.DateTime
+}
+
+model AgeTB {
+  Age Int  @id(map: "PK_AgeTB")
+  DRF Int?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Batchprn {
+  Trans_ID Int
+  ACID     Int?
+  Descr    String?  @db.VarChar(154)
+  AC_Sub   String?  @db.VarChar(100)
+  ACNO     String?  @db.VarChar(20)
+  Debit    Decimal? @db.Decimal(18, 2)
+  credit   Decimal? @db.Decimal(18, 2)
+  total    Decimal? @db.Decimal(19, 2)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model CB_P {
+  Trans_des_ID Int?
+  Trans_dt     DateTime? @db.DateTime
+  Trans_desc   String?   @db.VarChar(150)
+  AC_Sub       String?   @db.VarChar(100)
+  ACNO         String?   @db.VarChar(20)
+  Cash_amt     Decimal?  @db.Decimal(38, 2)
+  Chq_amt      Decimal?  @db.Decimal(38, 2)
+  Adj_amt      Decimal?  @db.Decimal(38, 2)
+  Total_amt    Decimal?  @db.Decimal(38, 2)
+  CB_side      String?   @db.NChar(1)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model CB_R {
+  Trans_des_ID Int?
+  Trans_dt     DateTime? @db.DateTime
+  Trans_desc   String?   @db.VarChar(150)
+  AC_Sub       String?   @db.VarChar(100)
+  ACNO         String?   @db.VarChar(20)
+  Cash_amt     Decimal?  @db.Decimal(38, 2)
+  Chq_amt      Decimal?  @db.Decimal(38, 2)
+  Adj_amt      Decimal?  @db.Decimal(38, 2)
+  Total_amt    Decimal?  @db.Decimal(38, 2)
+  CB_side      String?   @db.NChar(1)
+
+  @@ignore
+}
+
+model Chqdetails {
+  ChqID    Int       @id(map: "PK_Chqdetails") @default(autoincrement())
+  Pay_Mode String?   @db.NChar(5)
+  ChqNo    String?   @db.NChar(20)
+  ChqDt    DateTime? @db.DateTime
+  Chqamt   Decimal?  @db.Decimal(18, 2)
+  ChaBank  String?   @db.NVarChar(30)
+  ChqName  String?   @db.NVarChar(150)
+  ChqACNO  String?   @db.NVarChar(50)
+  VrNo     Int?
+  VrDt     DateTime? @db.DateTime
+  ACID     Int?
+  CrDt     DateTime? @db.DateTime
+  Trans_ID Int?
+}
+
+model db_user {
+  UserID   Int     @id(map: "PK_db_user") @default(autoincrement())
+  UserName String? @db.VarChar(30)
+  Pass     String? @db.NChar(10)
+  Type     Int?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Demand {
+  Demanid      Int       @default(autoincrement())
+  MemID        Int?
+  ACID         Int?
+  Demand_Amt   Int?
+  Recovery_Amt Int?
+  Demand_Month DateTime? @db.DateTime
+  Batchno      Int?
+
+  @@ignore
+}
+
+model DEP_TB {
+  DEPID      Int      @id(map: "PK_DEP_TB") @default(autoincrement())
+  ACID       Int?
+  DEPTYPE    String?  @db.VarChar(20)
+  Mem_AC_ID  Int?
+  DEPNAME    String?  @db.VarChar(50)
+  Relation   String?  @db.VarChar(50)
+  Percentage Decimal? @db.Decimal(18, 2)
+}
+
+model Display_TB {
+  id           Int     @id(map: "PK_Display_TB") @default(autoincrement())
+  Head_1       String? @db.VarChar(150)
+  Head_2       String? @db.VarChar(150)
+  Head_3       String? @db.VarChar(150)
+  DaysBook     String? @db.VarChar(150)
+  CashBook     String? @db.VarChar(150)
+  Trans_des_ID Int
+  Part         String? @db.VarChar(50)
+  Order1       Int?
+  Order2       Int?
+}
+
+model Monthly_Data {
+  ID      Int       @id(map: "PK_MRCYData") @default(autoincrement())
+  fromDT  DateTime? @db.DateTime
+  toDT    DateTime? @db.DateTime
+  AC_type String?   @db.VarChar(10)
+  AC_Sub  String?   @db.VarChar(10)
+  Rate    Decimal?  @default(0, map: "DF_MRCYData_Rate") @db.Decimal(18, 2)
+  Amount  Decimal?  @default(0, map: "DF_MRCYData_Amount") @db.Decimal(18, 2)
+}
+
+model sysdiagrams {
+  name         String @db.NVarChar(128)
+  principal_id Int
+  diagram_id   Int    @id(map: "PK__sysdiagrams__53A266AC") @default(autoincrement())
+  version      Int?
+  definition   Bytes?
+
+  @@unique([principal_id, name], map: "UK_principal_name")
+}
+
+model temp_demand {
+  id        Int      @id(map: "PK_temp_demand") @default(autoincrement())
+  MemID     Int?
+  hrno      Int?
+  name      String?  @db.VarChar(50)
+  desgn     String?  @db.VarChar(20)
+  ACID      Int?
+  AC_Sub    String?  @db.VarChar(50)
+  ACNO      String?  @db.VarChar(20)
+  Amt       Decimal? @db.Decimal(18, 2)
+  PRNBAL    Decimal? @db.Decimal(38, 2)
+  INTBAL    Decimal? @db.Decimal(38, 2)
+  EMI       Decimal? @db.Decimal(18, 2)
+  gno       Int?
+  Recovered Int
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Temptmpothers {
+  memidoth            Int
+  MEMBERS_SUSPENCE_AC Decimal? @map("MEMBERS SUSPENCE AC") @db.Decimal(38, 2)
+  THRIFT              Decimal? @db.Decimal(38, 2)
+  WELFARE             Decimal? @db.Decimal(38, 2)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tmp_hrno {
+  hrno Int?
+  ts   Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tmpothers {
+  memidoth            Int
+  INSURANCE           Decimal? @db.Decimal(38, 2)
+  Insurance_for_Loan  Decimal? @map("Insurance for Loan") @db.Decimal(38, 2)
+  MEMBERS_SUSPENCE_AC Decimal? @map("MEMBERS SUSPENCE AC") @db.Decimal(38, 2)
+  RD                  Decimal? @db.Decimal(38, 2)
+  THRIFT              Decimal? @db.Decimal(38, 2)
+  WELFARE             Decimal? @db.Decimal(38, 2)
+
+  @@ignore
+}
+
+model trans_desc_tb {
+  Trans_des_ID Int     @id(map: "PK_trans_tb") @default(autoincrement())
+  Head         String? @db.VarChar(100)
+  AC_Sub       String? @db.VarChar(100)
+  Trans_desc   String? @db.VarChar(150)
+  AC_type      String? @db.VarChar(10)
+  CB_side      String? @db.NChar(1)
+  TransType    String? @db.VarChar(1)
+  I_type       String? @db.VarChar(10)
+  Post_type    String? @db.VarChar(3)
+  Memtype      String? @db.VarChar(10)
+}
+
+model trans_tb {
+  Trans_ID     Int       @id(map: "PK_Data_tb") @default(autoincrement())
+  ActionID     Int?
+  Trans_des_ID Int?
+  Trans_dt     DateTime? @db.DateTime
+  CB_dt        DateTime? @db.DateTime
+  ACID         Int?
+  I_NO         String?   @db.VarChar(10)
+  Cash_amt     Decimal?  @default(0, map: "DF_trans_tb_Cash_amt") @db.Decimal(18, 2)
+  Chq_amt      Decimal?  @default(0, map: "DF_trans_tb_Chq_amt") @db.Decimal(18, 2)
+  Adj_amt      Decimal?  @default(0, map: "DF_trans_tb_Adj_amt") @db.Decimal(18, 2)
+  Total_amt    Decimal?  @default(0, map: "DF_trans_tb_Total_amt") @db.Decimal(18, 2)
+  PRN          Decimal?  @default(0, map: "DF_trans_tb_PRN") @db.Decimal(18, 2)
+  PRN_D        Decimal?  @default(0, map: "DF_trans_tb_PRN_T") @db.Decimal(18, 2)
+  PRN_C        Decimal?  @default(0, map: "DF_trans_tb_PRN_C") @db.Decimal(18, 2)
+  PRN_B        Decimal?  @default(0, map: "DF_trans_tb_PRN_B") @db.Decimal(18, 2)
+  INT          Decimal?  @default(0, map: "DF_trans_tb_INT") @db.Decimal(18, 2)
+  INT_D        Decimal?  @default(0, map: "DF_trans_tb_INT_D") @db.Decimal(18, 2)
+  INT_C        Decimal?  @default(0, map: "DF_trans_tb_INT_C") @db.Decimal(18, 2)
+  INT_B        Decimal?  @default(0, map: "DF_trans_tb_INT_B") @db.Decimal(18, 2)
+  rate         Decimal?  @default(0, map: "DF_trans_tb_rate") @db.Decimal(18, 2)
+  Days         Int?
+  Status       String?   @db.VarChar(1)
+  T_Order      Int?
+  CreatedOn    DateTime? @db.DateTime
+  CreatedBy    Int?
+  ModifiedOn   DateTime? @db.DateTime
+  ModifiedBy   Int?
+  Remarks      String?   @db.VarChar(50)
+}
+
+model xcl_rcy {
+  HRNO   Int  @id(map: "PK_xcl_rcy")
+  RCYAMT Int?
+}
+
+
+// introspectionSchemaVersion: NonPrisma 
+

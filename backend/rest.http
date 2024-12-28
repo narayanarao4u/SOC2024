@@ -1,0 +1,34 @@
+@hostName = http://localhost:3005
+
+get {{hostName}}/api/member
+
+###
+get {{hostName}}/api/account/newActionID
+
+
+###
+get {{hostName}}/api/trans/ACID/1
+
+
+###
+get {{hostName}}/api/trans/ActionID/1
+
+
+
+###
+get {{hostName}}/api/member/1972
+
+###
+get {{hostName}}/api/member/2
+
+###
+PUT {{hostName}}/api/member
+Content-Type: application/json
+{
+  "MemID": 1,
+  "Memtype": "EMP",
+  "empno": 5102,
+  "gno": 50,
+  "hrno": 998899,
+  "name": "MD AAA RAZACK",
+}
