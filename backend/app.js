@@ -19,6 +19,7 @@ app.use("/api/member", require("./routes/api.mem.route"));
 app.use("/api/account", require("./routes/api.ac.route"));
 app.use("/api/trans", require("./routes/api.trans.route"));
 app.use("/api/transDesc", require("./routes/api.transDesc"));
+app.use("/api/reports", require("./routes/api.reports.routes"));
 
 app.use((req, res, next) => {
   next(createError.NotFound());
