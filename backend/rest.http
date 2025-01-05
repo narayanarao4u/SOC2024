@@ -6,6 +6,9 @@ get {{hostName}}/api/member
 get {{hostName}}/api/reports/test
 
 ###
+post {{hostName}}/api/reports/test
+
+###
 get {{hostName}}/api/account/newActionID
 
 
