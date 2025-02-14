@@ -60,25 +60,8 @@ const reportQueries = [
   },
   {
     title: "AC balances as on date",
-    query: `WITH MaxOrder AS (
-    SELECT ACID, MAX(T_Order) AS T_order
-    FROM trans_tb
-    WHERE Trans_dt <= '@toDate'
-    GROUP BY ACID
-),
-FROMTABLE AS (
-    SELECT trans_tb.ACID, trans_tb.PRN_B, trans_tb.Trans_dt, trans_tb.rate, trans_tb.INT_B, trans_tb.CB_dt
-    FROM trans_tb
-    INNER JOIN MaxOrder ON trans_tb.ACID = MaxOrder.ACID AND trans_tb.T_Order = MaxOrder.T_order
-)
-SELECT VMA.ACID, VMA.gno, VMA.hrno, VMA.name, VMA.AC_Sub, 
-       VMA.ACNO, VMA.DOC, VMA.Amt, FTB.Trans_dt, 
-       FTB.CB_dt, FTB.PRN_B, FTB.INT_B, FTB.rate,
-     cast(round((FTB.PRN_B * POWER(1 + FTB.rate / 100, DATEDIFF(DAY, FTB.CB_dt, '@toDate') / 365.0) - FTB.PRN_B),2) as numeric(36,2)) AS AccInt
-FROM View_MEM_AC VMA 
-LEFT OUTER JOIN FROMTABLE FTB ON VMA.ACID = FTB.ACID
-WHERE VMA.AC_Sub = '@inputValue' and FTB.PRN_B > 0
-
+    query: `
+        select * from dbo.FT_AC_Bal_Torder ('@toDate') WHERE AC_Sub = '@inputValue' and PRN_B > 0
       `,
     summaryCols: ["PRN_B", "INT_B", "AccInt"],
     showCalender: true,
@@ -139,7 +122,7 @@ WHERE VMA.AC_Sub = '@inputValue' and FTB.PRN_B > 0
     query: `
       WITH ActionoIDs AS 
 (
-	SELECT DISTINCT ActionID  FROM   trans_tb  
+	SELECT  ActionID, CB_dt  FROM   trans_tb   group by ActionID, CB_dt  
 ), 
 Action_R AS
     (SELECT        tr.ActionID, SUM(tr.Adj_amt) AS ADJ_R, trdesc.CB_side
@@ -154,14 +137,14 @@ Action_P AS
       WHERE        (trdesc.CB_side = N'P') and not tr.Trans_des_ID in (250)
       GROUP BY tr.ActionID, trdesc.CB_side),
 VADJ as (
-SELECT TOP (100) PERCENT ActionoIDs.ActionID [BatchNo], Action_P_1.ADJ_P, Action_R_1.ADJ_R, 
-	ISNULL(Action_P_1.ADJ_P, 0) - ISNULL(Action_R_1.ADJ_R, 0) AS ADJ_Diff
+SELECT TOP (100) PERCENT ActionoIDs.ActionID, ActionoIDs.CB_dt, Action_P_1.ADJ_P, Action_R_1.ADJ_R, 
+	ISNULL(Action_P_1.ADJ_P, 0) - ISNULL(Action_R_1.ADJ_R, 0) AS ADJ_diff
      FROM            ActionoIDs LEFT OUTER JOIN
                               Action_R AS Action_R_1 ON ActionoIDs.ActionID = Action_R_1.ActionID LEFT OUTER JOIN
                               Action_P AS Action_P_1 ON ActionoIDs.ActionID = Action_P_1.ActionID
      ORDER BY ActionoIDs.ActionID
 )
-select * from VADJ where not ADJ_Diff= 0 and not BatchNo = 0
+select * from VADJ where not ADJ_diff= 0 and not ActionID = 0 order by CB_dt desc
     `,
     summaryCols: [],
   },
@@ -218,61 +201,61 @@ ORDER BY ActionDT;
   {
     title: "Balance Sheet",
     query: `
-      WITH ls AS (
-    SELECT 
-        ROW_NUMBER() OVER (ORDER BY AC_Type) AS Sno, 
-        AC_type, 
-        AC_Sub, 
-        SUM(PRNBAL + INTBAL) AS total 
-    FROM View_AC_Bal_Trans 
-    WHERE AC_type IN (N'DEPOSIT') 
-        AND CB_dt BETWEEN '@fromDate' AND '@toDate'  -- Apply date filter
-    GROUP BY AC_type, AC_Sub
-), 
-rs AS (
-    SELECT 
-        ROW_NUMBER() OVER (ORDER BY AC_Type) AS Sno, 
-        AC_type, 
-        AC_Sub, 
-        SUM(PRNBAL + INTBAL) AS total 
-    FROM View_AC_Bal_Trans 
-    WHERE AC_type IN (N'LOAN', N'ASSET') 
-        AND CB_dt BETWEEN '@fromDate' AND '@toDate'  -- Apply date filter
-    GROUP BY AC_type, AC_Sub
 
-    UNION ALL
-
-    SELECT 
-        7 AS Sno, 
-        'ASSET' AS AC_type, 
-        'BANK' AS AC_Sub, 
-        SUM(chq_amt * IIF(CB_side = 'R', 1, -1)) AS Total 
-    FROM View_Trans_TranDESC 
-    WHERE Chq_amt <> 0 
-        AND CB_dt BETWEEN '@fromDate' AND '@toDate'  -- Apply date filter
-), 
-t1 AS (
-    SELECT 
-        ls.Sno, 
-        ls.AC_Sub, 
-        ls.total AS Liabilities, 
-        rs.AC_Sub AS [AC Sub], 
-        rs.total AS Assets  
-    FROM ls 
-    FULL JOIN rs ON ls.Sno = rs.Sno
-) 
-
-SELECT * FROM t1 
-
-UNION 
-
-SELECT 
-    99 AS Sno, 
-    'Net Profit' AS AC_sub, 
-    SUM(Assets) - SUM(Liabilities) AS Liabilities, 
-    '' AS [AC Sub], 
-    NULL AS Assets  
-FROM t1;
+    WITH ls AS (
+      SELECT 
+          ROW_NUMBER() OVER (ORDER BY AC_Type) AS Sno, 
+          AC_type, 
+          AC_Sub, 
+          SUM(PRNBAL + INTBAL) AS total 
+      FROM FT_AC_Bal_Trans ('@toDate')
+      WHERE AC_type IN (N'DEPOSIT')         
+      GROUP BY AC_type, AC_Sub
+  ), 
+  rs AS (
+      SELECT 
+          ROW_NUMBER() OVER (ORDER BY AC_Type) AS Sno, 
+          AC_type, 
+          AC_Sub, 
+          SUM(PRNBAL + INTBAL) AS total 
+      FROM FT_AC_Bal_Trans ('@toDate')
+      WHERE AC_type IN (N'LOAN', N'ASSET') 
+         
+      GROUP BY AC_type, AC_Sub
+  
+      UNION ALL
+  
+      SELECT 
+          7 AS Sno, 
+          'ASSET' AS AC_type, 
+          'BANK' AS AC_Sub, 
+          SUM(chq_amt * IIF(CB_side = 'R', 1, -1)) AS Total 
+      FROM View_Trans_TranDESC 
+      WHERE Chq_amt <> 0 
+          AND CB_dt BETWEEN '@fromDate' AND '@toDate'  -- Apply date filter
+  ), 
+  t1 AS (
+      SELECT 
+          ls.Sno, 
+          ls.AC_Sub, 
+          ls.total AS Liabilities, 
+          rs.AC_Sub AS [AC Sub], 
+          rs.total AS Assets  
+      FROM ls 
+      FULL JOIN rs ON ls.Sno = rs.Sno
+  ) 
+  
+  SELECT * FROM t1 
+  
+  UNION 
+  
+  SELECT 
+      99 AS Sno, 
+      'Net Profit' AS AC_sub, 
+      SUM(Assets) - SUM(Liabilities) AS Liabilities, 
+      '' AS [AC Sub], 
+      NULL AS Assets  
+  FROM t1;
 
     
     `,
@@ -369,7 +352,7 @@ router.post("/query", async (req, res) => {
     }
 
     return res.json({
-      data: result,
+      data: JSON.parse(JSON.stringify(result, (key, value) => (typeof value === "bigint" ? value.toString() : value))),
       summaryCols: sqlConfig.summaryCols || [],
     });
   } catch (error) {
