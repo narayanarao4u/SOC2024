@@ -262,6 +262,45 @@ ORDER BY ActionDT;
     summaryCols: ["Assets", "Liabilities"],
     showCalender: true,
   },
+  {
+    title: "Profit & Loss Statement",
+    query: `
+      
+with exp1 as (
+select  Descr Expense, sum(Debit) Total  from View_1 
+	where part = 'INT' and ACT_DT between '@fromDate' and '@toDate'
+	group by Descr having not sum(Debit) = 0
+union
+select 'THRIFT Int ' Expense, sum(INT_C) Total from View_Trans_TranDESC 
+	where AC_Sub in ('Thrift' )
+	and Trans_dt between '@fromDate' and '@toDate'
+union
+select  AC_Sub Expense, sum(Total_amt) Total from View_AC_TRANS where AC_type in (N'EXPENSES')  
+	and Trans_dt between '@fromDate' and '@toDate'
+	group by AC_Sub
+), exp2 as (
+	select ROW_NUMBER() over (order by Expense) Sno, * from exp1
+), Inc1 as (
+select  Descr Income, sum(Credit) Total  from View_1 
+	where part = 'INT' and ACT_DT between '@fromDate' and '@toDate'
+	group by Descr having not sum(Credit) = 0 
+union all
+select  AC_Sub Income, sum(Total_amt) Total from View_AC_TRANS 
+	where AC_type in (N'INCOMES')  
+	and Trans_dt between '@fromDate' and '@toDate'
+	group by AC_Sub
+), Inc2 as (
+	select ROW_NUMBER() over (order by Income) Sno, * from Inc1
+), t1 as ( 
+select exp2.Sno, exp2.Expense, exp2.Total, inc2.Income, Inc2.Total TotalI from exp2 full join Inc2 on exp2.Sno = Inc2.Sno
+) select * from t1
+union all
+select 99 Sno, 'Net Profit/loss' Expense, sum(TotalI) - sum(Total) Total, null, null from t1
+
+    `,
+    summaryCols: ["Total", "TotalI"],
+    showCalender: true,
+  },
 ];
 
 // Routes Start Here
