@@ -1,18 +1,18 @@
 const router = require("express").Router();
 const { PrismaClient } = require("@prisma/client");
 
+const ACData = require("../models/accountsModel");
+
 const prisma = new PrismaClient();
 
 // api/account
 router.get("/", async (req, res, next) => {
   try {
-    const AC_tb = await prisma.AC_tb.findMany({
-      include: { mem_tb: true },
-      orderBy: { id: "desc" },
-    });
-    // const AC_tb = await prisma.AC_tb.findFirst({
-    //   include: { mem_tb: true },
-    // });
+// const AC_tb = await prisma.$queryRaw`SELECT Top 10 acid id, * FROM AC_tb ORDER BY acid DESC  `;
+console.log('fired');
+
+
+const AC_tb = await ACData.getACData();
     res.json(AC_tb);
   } catch (err) {
     console.log(err);
@@ -38,6 +38,7 @@ router.get("/:id", async (req, res, next) => {
     const member = await prisma.AC_tb.findMany({
       where: { id: +req.params.id },
       include: { mem_tb: true },
+      
     });
     res.json(member);
   } catch (err) {

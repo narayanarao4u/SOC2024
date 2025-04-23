@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 const reportQueries = [
   {
     title: "Total Members",
-    query: `SELECT gno GNo, name Name, desgn Desgn FROM mem_tb`,
+    query: `SELECT gno GNo, name Name, desgn Desgn,EMPNO, HRNO FROM mem_tb`,
     showCalender: false,
   },
   {
@@ -49,15 +49,7 @@ const reportQueries = [
     summaryCols: [],
     showCalender: false,
   },
-  {
-    title: "Batch Transcations",
-    query: `select ActionID as BatchNo, ACT_DT as Date,Descr, AC_Sub, ACNO, MEMID, Debit,Credit from View_1 where ActionID>0
-            and  ActionID =  @inputValue
-      `,
-    summaryCols: ["Debit", "Credit"],
-    showCalender: true,
-    InputLabel: "Enter Batch No",
-  },
+
   {
     title: "AC balances as on date",
     query: `
@@ -117,6 +109,16 @@ const reportQueries = [
     InputDefValue: "-1",
     isStoredProcedure: true,
   },
+  {
+    title: "Batch Transcations",
+    query: `select ActionID as BatchNo, ACT_DT as Date,Descr, AC_Sub, ACNO, MEMID, Debit,Credit from View_1 where ActionID>0
+            and  ActionID =  @inputValue
+      `,
+    summaryCols: ["Debit", "Credit"],
+    showCalender: true,
+    InputLabel: "Enter Batch No",
+  },
+
   {
     title: "Batch Adjustment errors",
     query: `
