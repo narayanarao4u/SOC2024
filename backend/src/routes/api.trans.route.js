@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const { PrismaClient } = require("@prisma/client");
 
+const TransModel = require("../models/trans.Model");
+
 const prisma = new PrismaClient();
 
 const dtFields = [
@@ -15,6 +17,17 @@ const dtFields = [
   "ModifiedOn",
 ];
 
+//api/trans/batch/:id
+router.get("/batch/:id", async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const trans_tb = await TransModel.getTransByBatch(id);
+    res.json(trans_tb);
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+});
 // api/trans_tb
 router.get("/:transby/:id", async (req, res, next) => {
   try {
@@ -24,7 +37,13 @@ router.get("/:transby/:id", async (req, res, next) => {
     const trans_tb = await prisma.trans_tb.findMany({
       where: { [transby]: +id },
       orderBy: [{ Trans_dt: "desc" }, { T_Order: "desc" }],
-      take: 100,
+      take: 1500,
+      include: { AC_tb: {
+        include: {
+          mem_tb: true
+        }
+      }
+       }
     });
     // console.log("trans_tb", trans_tb);
     res.json(trans_tb);
@@ -49,10 +68,13 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-// post /api/member
+// post /api/trans
 router.post("/", async (req, res, next) => {
   try {
     if (req.body.id) delete req.body.id;
+
+    if(req.body.Trans_dt) req.body.Trans_dt = new Date(req.body.Trans_dt);
+    if(req.body.CB_dt) req.body.CB_dt = new Date(req.body.CB_dt);
 
     const newMember = await prisma.trans_tb.create({
       data: req.body,
@@ -64,10 +86,13 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-// put /api/member
+// put /api/trans
 router.put("/:id", async (req, res, next) => {
   let id = req.body.id;
   delete req.body.id;
+  if(req.body.Trans_dt) req.body.Trans_dt = new Date(req.body.Trans_dt);
+  if(req.body.CB_dt) req.body.CB_dt = new Date(req.body.CB_dt);
+  
   try {
     const updatedMember = await prisma.trans_tb.update({
       where: { id: +id },

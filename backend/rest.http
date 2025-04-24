@@ -38,3 +38,14 @@ Content-Type: application/json
   "hrno": 998899,
   "name": "MD AAA RAZACK",
 }
+
+
+
+###
+POST {{hostName}}/api/batch
+Content-Type: application/json
+{
+    "ActionDesc": "2025-04-24",
+    "MemID": 1,
+    "ActionDT": "2025-04-24"
+}

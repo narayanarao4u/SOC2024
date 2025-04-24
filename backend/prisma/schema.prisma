@@ -24,7 +24,7 @@ model AC_tb {
   Closed  String?   @default("N") @db.VarChar(1)
   Remarks String?   @db.NVarChar(250)
 
-  Trans    Trans[]  @relation("AccountTransactions")
+  Trans    trans_tb[]  @relation("AccountTransactions")
 }
 
 model mem_tb {
@@ -68,8 +68,7 @@ model trans_tb {
   Trans_des_ID Int?
   Trans_dt     DateTime? @db.DateTime
   CB_dt        DateTime? @db.DateTime
-  ACID         Int?
-  AC_tb        AC_tb?   @relation(fields: [ACID], references: [id])
+  ACID         Int
   I_NO         String?   @db.VarChar(10)
   Cash_amt     Float?  @default(0, map: "DF_trans_tb_Cash_amt") @db.Float()
   Chq_amt      Float?  @default(0, map: "DF_trans_tb_Chq_amt") @db.Float()
@@ -94,5 +93,6 @@ model trans_tb {
   Remarks      String?   @db.VarChar(50)
   CB_side      String? @db.NChar(1)
 
-   ac_tb     ac_tb  @relation("AccountTransactions", fields: [ACID], references: [id])
+  AC_tb        AC_tb  @relation("AccountTransactions", fields: [ACID], references: [id])
+
 }

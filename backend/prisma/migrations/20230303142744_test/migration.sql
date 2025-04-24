@@ -1,0 +1,20 @@
+BEGIN TRY
+
+BEGIN TRAN;
+
+-- AlterTable
+ALTER TABLE [dbo].[mem_tb] DROP CONSTRAINT [mem_tb_Memtype_df];
+ALTER TABLE [dbo].[mem_tb] ADD CONSTRAINT [mem_tb_Memtype_df] DEFAULT 'emp' FOR [Memtype];
+
+COMMIT TRAN;
+
+END TRY
+BEGIN CATCH
+
+IF @@TRANCOUNT > 0
+BEGIN
+    ROLLBACK TRAN;
+END;
+THROW
+
+END CATCH

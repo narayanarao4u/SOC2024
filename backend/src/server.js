@@ -20,6 +20,7 @@ app.use("/api/account", require("./routes/api.ac.route"));
 app.use("/api/trans", require("./routes/api.trans.route"));
 app.use("/api/transDesc", require("./routes/api.transDesc"));
 app.use("/api/reports", require("./routes/api.reports.routes"));
+app.use("/api/batch", require("./routes/api.batch.route"));
 
 app.use((req, res, next) => {
   next(createError.NotFound());
