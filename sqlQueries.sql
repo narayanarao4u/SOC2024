@@ -8,6 +8,19 @@ GO
 SET QUOTED_IDENTIFIER ON
 
 
+Print 'Alter table trans_tb'
+IF COL_LENGTH('trans_tb', 'CB_side') IS NULL
+BEGIN
+    Alter table trans_tb
+   ADD [CB_side]  nchar(1) NULL
+END
+ELSE
+BEGIN
+    Alter table trans_tb
+   ALTER COLUMN [CB_side]  nchar(1)
+END
+go
+
 
 IF OBJECT_ID('FT_AC_Bal_Torder', 'IF') IS NOT NULL
     DROP FUNCTION FT_AC_Bal_Torder

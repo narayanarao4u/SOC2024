@@ -50,6 +50,7 @@ router.get("/:id", async (req, res, next) => {
 // api/account/search
 router.post("/search", async (req, res, next) => {
   try {
+    // console.log(req.body);
     const member = await prisma.AC_tb.findMany({
       where: req.body,
       include: { mem_tb: true },
