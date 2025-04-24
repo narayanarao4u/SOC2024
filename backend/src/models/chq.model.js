@@ -28,9 +28,21 @@ class ChqModel {
     // Get cheque by ID
     static async getChqById(chqId) {
         return knex('Chqdetails')
-            .where('ChqID', chqId)
+            .where('ChqID', +chqId)
             .first();
     }
+
+    static async getBatchDataById(Trans_ID) {
+        const id = Number(Trans_ID);
+        console.log("Fetching batch for Trans_ID:", id);
+        let result = await knex.raw(`
+            SELECT * FROM Chqdetails
+            WHERE Trans_ID = ?
+        `, [id]);
+        console.log("Result from getBatchDataById:", result);
+        return result;          
+    }
+    
 
     // Update cheque record
     static async updateChq(chqId, chqData) {
