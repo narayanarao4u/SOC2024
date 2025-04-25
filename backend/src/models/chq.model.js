@@ -34,25 +34,27 @@ class ChqModel {
 
     static async getBatchDataById(Trans_ID) {
         const id = Number(Trans_ID);
-        console.log("Fetching batch for Trans_ID:", id);
+        
         let result = await knex.raw(`
             SELECT * FROM Chqdetails
             WHERE Trans_ID = ?
         `, [id]);
-        console.log("Result from getBatchDataById:", result);
+       
         return result;          
     }
+        
     
-
     // Update cheque record
     static async updateChq(chqId, chqData) {
+        console.log(chqData);
+        
         return knex('Chqdetails')
-            .where('ChqID', chqId)
+            .where('ChqID', +chqId)
             .update({
                 Pay_Mode: chqData.Pay_Mode,
                 ChqNo: chqData.ChqNo,
                 ChqDt: chqData.ChqDt,
-                Chqamt: chqData.Chqamt,
+                Chqamt: Number(chqData.Chqamt),
                 ChaBank: chqData.ChaBank,
                 ChqName: chqData.ChqName,
                 ChqACNO: chqData.ChqACNO,
@@ -60,7 +62,7 @@ class ChqModel {
                 VrDt: chqData.VrDt,
                 ACID: chqData.ACID,
                 CrDt: chqData.CrDt,
-                Trans_ID: chqData.Trans_ID
+                Trans_ID: Number(chqData.Trans_ID)
             });
     }
 

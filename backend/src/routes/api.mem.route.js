@@ -1,16 +1,18 @@
 const router = require("express").Router();
 const { PrismaClient } = require("@prisma/client");
 
+const memData = require("../models/MemModel");
+
 const prisma = new PrismaClient();
 
 // api/member
 router.get("/", async (req, res, next) => {
   try {
-    const mem_tb = await prisma.mem_tb.findMany({});
-    /*     const mem_tb = await prisma.mem_tb.findFirst({
-      include: { Accounts: true },
-    }); */
-    res.json(mem_tb);
+    console.log('fired');
+    
+    const memdt = await memData.getMemData();
+    res.json(memdt);
+    
   } catch (err) {
     console.log(err);
     next(err);

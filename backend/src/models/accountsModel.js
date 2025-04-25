@@ -10,9 +10,13 @@ class ACData {
     
     return knex.raw(query);
   }
+  static async getACBalByMEMID(MEMID) {
+    let query =   `SELECT * FROM dbo.View_AC_Bal_Trans where MEMID = ${MEMID}`;  
+    
+    return knex.raw(query);
+  }
 
-
-
+  
 
 }
 

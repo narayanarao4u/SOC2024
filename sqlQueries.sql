@@ -233,3 +233,30 @@ RETURN
         A.ACID DESC
 )
 GO
+
+
+
+
+WITH RankedTransactions AS (
+    SELECT 
+        Trans_ID,
+        ACID, 
+        Trans_dt, 
+        T_Order,
+        PRN_B, 
+        INT_B,
+        ROW_NUMBER() OVER (
+            PARTITION BY ACID 
+            ORDER BY Trans_dt DESC, T_Order DESC
+        ) AS rn
+    FROM trans_tb
+)
+SELECT 
+    ACID, 
+    Trans_ID,
+    Trans_dt,
+    T_Order,
+    PRN_B, 
+    INT_B
+FROM RankedTransactions
+WHERE rn = 1

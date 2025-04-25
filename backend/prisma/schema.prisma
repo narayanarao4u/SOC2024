@@ -93,6 +93,6 @@ model trans_tb {
   Remarks      String?   @db.VarChar(50)
   CB_side      String? @db.NChar(1)
 
-  AC_tb        AC_tb  @relation("AccountTransactions", fields: [ACID], references: [id])
+  AC_tb        AC_tb?  @relation("AccountTransactions", fields: [ACID], references: [id])
 
 }

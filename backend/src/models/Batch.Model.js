@@ -7,6 +7,7 @@ class BatchModel {
     `); 
   }
 
+
   static async insertAction(actionData) {
     return knex('Action_TB')
       .insert({

@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const ChqModel = require("../models/chq.model");
+const ChqModel = require("../models/Chq.model");
 
 
 // /api/chqDetails
